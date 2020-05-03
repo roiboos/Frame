@@ -1,0 +1,42 @@
+{
+	"windows": 
+	{
+		"eg": 0,
+		"og": 1
+	},
+	"garbage": 
+	{
+		"rest": "morgen",
+		"papier": ""
+	},
+	"today": 
+	{
+		"dayofweek": "Montag",
+		"day": "9",
+		"month": "September",
+		"year": "2020"
+	},
+	"calendar": 
+	{
+		"first": 5,
+		"days": 31
+	},
+	"weather":
+	{
+		"current": 
+		{
+			"temperature": "24°C",
+			"description": "clear"
+		},
+		"morning":
+		{
+			"temperature": "24°C",
+			"description": "clear"
+		},
+		"afternoon":
+		{
+			"temperature": "24°",
+			"description": "clear"
+		}
+	}
+}

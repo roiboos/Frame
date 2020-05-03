@@ -25,45 +25,81 @@
  ##
 
 import epd5in83b
+import json
+import hashlib
+import time
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-#import Image
-#import ImageDraw
-#import ImageFont
-#import imagedata
 
 EPD_WIDTH = 600
 EPD_HEIGHT = 448
 
 def main():
+    last_hash = ''
     epd = epd5in83b.EPD()
-    epd.init()
 
-    # For simplicity, the arguments are explicit numerical coordinates
-    image_red = Image.new('1', (600, 448), 255)    # 255: clear the frame
-    font_weekday = ImageFont.truetype('./montserrat-regular.ttf', 48)
-    font_day = ImageFont.truetype('./montserrat-bold.ttf', 120) 
-    font_month = ImageFont.truetype('./montserrat-regular.ttf', 24)
-    font_cal_day = ImageFont.truetype('./montserrat-regular.ttf', 16)
-    # display images
-    image_black = Image.open('display_black.bmp')
-    draw_black = ImageDraw.Draw(image_black);
-    (width, height) = font_weekday.getsize('Mittwoch');
-    draw_black.text(((242-width)/2, 33), 'Mittwoch', font = font_weekday, fill = 255)
-    draw_black.text((82, 72), '9', font = font_day, fill = 255)
-    (width, height) = font_month.getsize('September 2020')
-    draw_black.text(((242-width)/2, 210), 'September 2020', font = font_month, fill = 255)
-    base = 5
-    for i in range(base, 31 + 1 + base):
-        draw_black.text(((16+((i-1) % 7)*32), 309 + ((i-1)//7*28)), str(i-base+1), font = font_cal_day, fill = 255) 
+    while True:
+        with open('data.json', 'r') as read_file:
+            data = json.load(read_file) 
+        with open('data.json', 'r') as read_file:
+            content = read_file.read();
+
+        hash_returned = hashlib.md5(content.encode('utf-8')).hexdigest()
+        print(hash_returned)
+        print(last_hash)
+        if hash_returned != last_hash:
+            print('Hash changed')
+            last_hash = hash_returned
+
+            epd.init()
+
+            # For simplicity, the arguments are explicit numerical coordinates
+            image_red = Image.new('1', (600, 448), 255)    # 255: clear the frame
+            font_weekday = ImageFont.truetype('./publicsans-regular.ttf', 48)
+            font_day = ImageFont.truetype('./publicsans-bold.ttf', 120) 
+            font_month = ImageFont.truetype('./publicsans-regular.ttf', 24)
+            font_cal_day = ImageFont.truetype('./publicsans-regular.ttf', 16)
+            font_garbage = ImageFont.truetype('./publicsans-regular.ttf', 20)
+            font_temp_current = ImageFont.truetype('./publicsans-regular.ttf', 48)
+            # display images
+            image_black = Image.open('display_black.bmp')
+            draw_black = ImageDraw.Draw(image_black);
+
+            day_of_week = data['today']['dayofweek']
+            (width, height) = font_weekday.getsize(day_of_week);
+            draw_black.text(((242-width)/2, 33), day_of_week, font = font_weekday, fill = 255)
+
+            day = data['today']['day'];
+            draw_black.text((82, 72), day, font = font_day, fill = 255)
+
+            month = data['today']['month'] + ' ' + data['today']['year']
+            (width, height) = font_month.getsize(month)
+            draw_black.text(((242-width)/2, 210), month, font = font_month, fill = 255)
+
+            base = data['calendar']['first']
+            days_in_month = data['calendar']['days'] 
+            for i in range(base, days_in_month + 1 + base):
+                draw_black.text(((16+((i-1) % 7)*32), 309 + ((i-1)//7*28)), str(i-base+1), font = font_cal_day, fill = 255)
+
+            draw_black.text((379, 183), data['garbage']['rest'], font = font_garbage, fill = 0)
+            draw_black.text((379, 216), data['garbage']['papier'], font = font_garbage, fill = 0)
+
+            draw_black.text((308, 280), data['weather']['current']['temperature'], font = font_temp_current, fill = 0) 
+    
     #image_closed = Image.open('closed.bmp')
     #image_open = Image.open('open.bmp')
     #image_black.paste(image_closed, (100, 100))
     #image_red.paste(image_open, (300, 50))
-    epd.display_frame(epd.get_frame_buffer(image_black),epd.get_frame_buffer(image_red))
-    epd.wait_until_idle()
-    epd.sleep()
+            epd.display_frame(epd.get_frame_buffer(image_black),epd.get_frame_buffer(image_red))
+            epd.wait_until_idle()
+            epd.sleep()
+        
+        else:
+            print('Nothing changed')
+
+        time.sleep(10)
+    
     exit()
 
 if __name__ == '__main__':
