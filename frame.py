@@ -56,6 +56,8 @@ def main():
 
             # For simplicity, the arguments are explicit numerical coordinates
             image_red = Image.new('1', (600, 448), 255)    # 255: clear the frame
+            #draw_red = ImageDraw.Draw(image_red)
+
             font_weekday = ImageFont.truetype('./publicsans-regular.ttf', 48)
             font_day = ImageFont.truetype('./publicsans-bold.ttf', 120) 
             font_month = ImageFont.truetype('./publicsans-regular.ttf', 24)
@@ -82,10 +84,19 @@ def main():
             for i in range(base, days_in_month + 1 + base):
                 draw_black.text(((16+((i-1) % 7)*32), 309 + ((i-1)//7*28)), str(i-base+1), font = font_cal_day, fill = 255)
 
-            draw_black.text((379, 183), data['garbage']['rest'], font = font_garbage, fill = 0)
-            draw_black.text((379, 216), data['garbage']['papier'], font = font_garbage, fill = 0)
+            #garbage_rest = data['garbage']['rest'];
+            #if garbage_rest == 'MORGEN' or garbage_rest == 'HEUTE':
+            #    draw_red.text((379, 183), garbage_rest, font = font_garbage, fill = 0)
+            #else:
+            #    draw_black.text((379, 183), data['garbage']['rest'], font = font_garbage, fill = 0)
+            
+            #garbage_papier = data['garbage']['papier']
+            #if garbage_papier == 'MORGEN' or garbage_papier == 'HEUTE':
+            #    draw_red.text((379, 216), garbage_papier, font = font_garbage, fill = 0)
+            #else:
+            #    draw_black.text((379, 216), data['garbage']['papier'], font = font_garbage, fill = 0)
 
-            draw_black.text((308, 280), data['weather']['current']['temperature'], font = font_temp_current, fill = 0) 
+            draw_black.text((308, 280), '19', font = font_temp_current, fill = 0) 
     
     #image_closed = Image.open('closed.bmp')
     #image_open = Image.open('open.bmp')
