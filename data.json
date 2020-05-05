@@ -7,7 +7,7 @@
 	"garbage": 
 	{
 		"rest": "MORGEN",
-		"papier": ""
+		"papier": "HEUTE"
 	},
 	"today": 
 	{
@@ -35,8 +35,18 @@
 		},
 		"afternoon":
 		{
-			"temperature": "24°",
+			"temperature": "24C°",
 			"description": "clear"
-		}
+		},
+                "evening":
+                {
+                        "temperature": "24°C",
+                        "description": "clear"
+                },
+                "night":
+                {
+                        "temperature": "24°C",
+                        "description": "clear"
+                }
 	}
 }

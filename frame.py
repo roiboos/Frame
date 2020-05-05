@@ -56,14 +56,16 @@ def main():
 
             # For simplicity, the arguments are explicit numerical coordinates
             image_red = Image.new('1', (600, 448), 255)    # 255: clear the frame
-            #draw_red = ImageDraw.Draw(image_red)
+            draw_red = ImageDraw.Draw(image_red)
 
             font_weekday = ImageFont.truetype('./publicsans-regular.ttf', 48)
             font_day = ImageFont.truetype('./publicsans-bold.ttf', 120) 
             font_month = ImageFont.truetype('./publicsans-regular.ttf', 24)
             font_cal_day = ImageFont.truetype('./publicsans-regular.ttf', 16)
             font_garbage = ImageFont.truetype('./publicsans-regular.ttf', 20)
+            font_garbage_warn = ImageFont.truetype('./publicsans-bold.ttf', 20)
             font_temp_current = ImageFont.truetype('./publicsans-regular.ttf', 48)
+            font_temp_forecast = ImageFont.truetype('./publicsans-regular.ttf', 20)
             # display images
             image_black = Image.open('display_black.bmp')
             draw_black = ImageDraw.Draw(image_black);
@@ -84,20 +86,23 @@ def main():
             for i in range(base, days_in_month + 1 + base):
                 draw_black.text(((16+((i-1) % 7)*32), 309 + ((i-1)//7*28)), str(i-base+1), font = font_cal_day, fill = 255)
 
-            #garbage_rest = data['garbage']['rest'];
-            #if garbage_rest == 'MORGEN' or garbage_rest == 'HEUTE':
-            #    draw_red.text((379, 183), garbage_rest, font = font_garbage, fill = 0)
-            #else:
-            #    draw_black.text((379, 183), data['garbage']['rest'], font = font_garbage, fill = 0)
+            garbage_rest = data['garbage']['rest'];
+            if garbage_rest == 'MORGEN' or garbage_rest == 'HEUTE':
+                draw_red.text((379, 172), garbage_rest, font = font_garbage_warn, fill = 0)
+            else:
+                draw_black.text((379, 172), data['garbage']['rest'], font = font_garbage, fill = 0)
             
-            #garbage_papier = data['garbage']['papier']
-            #if garbage_papier == 'MORGEN' or garbage_papier == 'HEUTE':
-            #    draw_red.text((379, 216), garbage_papier, font = font_garbage, fill = 0)
-            #else:
-            #    draw_black.text((379, 216), data['garbage']['papier'], font = font_garbage, fill = 0)
+            garbage_papier = data['garbage']['papier']
+            if garbage_papier == 'MORGEN' or garbage_papier == 'HEUTE':
+                draw_red.text((379, 201), garbage_papier, font = font_garbage_warn, fill = 0)
+            else:
+                draw_black.text((379, 201), data['garbage']['papier'], font = font_garbage, fill = 0)
 
-            draw_black.text((308, 280), '19', font = font_temp_current, fill = 0) 
-    
+            draw_black.text((414, 300), data['weather']['current']['temperature'], font = font_temp_current, fill = 0)
+            draw_black.text((280, 410), data['weather']['morning']['temperature'], font = font_temp_forecast, fill = 0)
+            draw_black.text((365, 410), data['weather']['afternoon']['temperature'], font = font_temp_forecast, fill = 0)
+            draw_black.text((450, 410), data['weather']['evening']['temperature'], font = font_temp_forecast, fill = 0)
+            draw_black.text((530, 410), data['weather']['night']['temperature'], font = font_temp_forecast, fill = 0)
     #image_closed = Image.open('closed.bmp')
     #image_open = Image.open('open.bmp')
     #image_black.paste(image_closed, (100, 100))
