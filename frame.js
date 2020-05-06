@@ -79,11 +79,6 @@ function refresh() {
     data.calendar.first = moment().startOf('month').isoWeekday();
     data.calendar.days = now.daysInMonth();
 
-    weather.getTemperature(function (err, temp) {
-        console.log(temp);
-        data.weather.current.temperature = `${temp.toFixed(1)}°C`;
-    });
-
     weather.getWeatherForecast(function (err, obj) {
         obj.list.filter(element => {
             const ts = moment.utc(element.dt, "X");
@@ -91,22 +86,26 @@ function refresh() {
         }).forEach(element => {
             const ts = moment.utc(element.dt, "X");
             if (ts.hour() === 18 && ts.date() === now.date()) {
-                data.weather.evening.temperature = `${element.main.temp}°C`
+                data.weather.evening.temperature = `${element.main.temp.toFixed(1)}°C`
             }
             if (ts.hour() === 0 && ts.date() === now.date() + 1) {
-                data.weather.night.temperature = `${element.main.temp}°C`
+                data.weather.night.temperature = `${element.main.temp.toFixed(1)}°C`
             }
             if (ts.hour() === 9 && ts.date() === now.date()) {
-                data.weather.morning.temperature = `${element.main.temp}°C`
+                data.weather.morning.temperature = `${element.main.temp.toFixed(1)}°C`
             }
             if (ts.hour() === 12 && ts.date() === now.date()) {
-                data.weather.afternoon.temperature = `${element.main.temp}°C`
+                data.weather.afternoon.temperature = `${element.main.temp.toFixed(1)}°C`
             }
         });
-    });
 
-    let dataString = JSON.stringify(data);
-    fs.writeFileSync('data.json', dataString)
+	weather.getTemperature(function (err, temp) {
+        	console.log(temp);
+        	data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+                let dataString = JSON.stringify(data);
+                fs.writeFileSync('data.json', dataString);
+    	});
+    });
 }
 
 function getMonthName(month) {

@@ -105,10 +105,15 @@ def main():
             draw_black.text((365, 410), data['weather']['afternoon']['temperature'], font = font_temp_forecast, fill = 0)
             draw_black.text((450, 410), data['weather']['evening']['temperature'], font = font_temp_forecast, fill = 0)
             draw_black.text((530, 410), data['weather']['night']['temperature'], font = font_temp_forecast, fill = 0)
-    #image_closed = Image.open('closed.bmp')
-    #image_open = Image.open('open.bmp')
-    #image_black.paste(image_closed, (100, 100))
-    #image_red.paste(image_open, (300, 50))
+
+
+            image_open = Image.open('open.bmp')
+            if data['windows']['eg'] == True:
+                image_red.paste(image_open, (380, 41))
+
+            if data['windows']['og'] == True:
+                image_red.paste(image_open, (510, 41))
+
             epd.display_frame(epd.get_frame_buffer(image_black),epd.get_frame_buffer(image_red))
             epd.wait_until_idle()
             epd.sleep()
@@ -116,7 +121,7 @@ def main():
         else:
             print('Nothing changed')
 
-        time.sleep(10)
+        time.sleep(60)
     
     exit()
 
