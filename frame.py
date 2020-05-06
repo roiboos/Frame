@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ##
  #  @filename   :   main.cpp
  #  @brief      :   7.5inch e-paper display demo
@@ -40,9 +42,9 @@ def main():
     epd = epd5in83b.EPD()
 
     while True:
-        with open('data.json', 'r') as read_file:
+        with open('./data.json', 'r') as read_file:
             data = json.load(read_file) 
-        with open('data.json', 'r') as read_file:
+        with open('./data.json', 'r') as read_file:
             content = read_file.read();
 
         hash_returned = hashlib.md5(content.encode('utf-8')).hexdigest()

@@ -88,7 +88,7 @@ function refresh() {
             if (ts.hour() === 18 && ts.date() === now.date()) {
                 data.weather.evening.temperature = `${element.main.temp.toFixed(1)}°C`
             }
-            if (ts.hour() === 0 && ts.date() === now.date() + 1) {
+            if (ts.hour() === 3 && ts.date() === now.date() + 1) {
                 data.weather.night.temperature = `${element.main.temp.toFixed(1)}°C`
             }
             if (ts.hour() === 9 && ts.date() === now.date()) {
