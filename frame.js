@@ -46,13 +46,14 @@ function connect() {
 
     intervalObj = setInterval(() => {
         refresh();
-    }, 5 * 60 * 1000);
+    }, 1 * 10 * 1000);
 }
 
 function submitSensorChange(sensorId, lastupdated, attribute, value) {
     console.log(sensorId, value);
     let data = require('./data.json');
-    let floor = sensorId === 2 || sensorId === 5 || sensorId === 10 ? 'eg' : 'og';
+    let floor = sensorId === '2' || sensorId === '5' || sensorId === '10' ? 'eg' : 'og';
+    console.log('Floor', floor);
     if (floor === 'eg') {
         data.windows.eg = value;
     } else {

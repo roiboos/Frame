@@ -103,11 +103,13 @@ def main():
                 draw_black.text((379, 201), data['garbage']['papier'], font = font_garbage, fill = 0)
 
             draw_black.text((414, 300), data['weather']['current']['temperature'], font = font_temp_current, fill = 0)
+            image_weather = Image.open('clear.bmp')
+            image_black.paste(image_weather, (300,283)) 
+
             draw_black.text((280, 410), data['weather']['morning']['temperature'], font = font_temp_forecast, fill = 0)
             draw_black.text((365, 410), data['weather']['afternoon']['temperature'], font = font_temp_forecast, fill = 0)
             draw_black.text((450, 410), data['weather']['evening']['temperature'], font = font_temp_forecast, fill = 0)
-            draw_black.text((530, 410), data['weather']['night']['temperature'], font = font_temp_forecast, fill = 0)
-
+            draw_black.text((530, 410), data['weather']['night']['temperature'], font = font_temp_forecast, fill = 0)   
 
             image_open = Image.open('open.bmp')
             if data['windows']['eg'] == True:
