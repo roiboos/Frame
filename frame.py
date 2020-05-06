@@ -77,6 +77,8 @@ def main():
             day = data['today']['day'];
             draw_black.text((82, 72), day, font = font_day, fill = 255)
 
+            print(data['today']['month'])
+            print(data['today']['year'])
             month = data['today']['month'] + ' ' + data['today']['year']
             (width, height) = font_month.getsize(month)
             draw_black.text(((242-width)/2, 210), month, font = font_month, fill = 255)
