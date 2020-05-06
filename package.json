@@ -5,6 +5,7 @@
   "main": "frame.js",
   "dependencies": {
     "forever": "^2.0.0",
+    "minimist": "^1.2.5",
     "moment": "^2.25.3",
     "openweather-apis": "^4.3.1",
     "ws": "^7.2.5"
