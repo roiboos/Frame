@@ -46,9 +46,9 @@ function connect() {
 
     intervalObj = setInterval(() => {
         const now = moment();
-        if(now.hour() > 6) {
+        if (now.hour() > 6) {
             refresh();
-	}
+        }
     }, 5 * 60 * 1000);
 }
 
@@ -86,6 +86,21 @@ function refresh() {
     data.calendar.first = moment().startOf('month').isoWeekday();
     data.calendar.days = now.daysInMonth();
 
+    let garbage = require('./garbage.json');
+    const rest = garbage.rest
+        .map(x => moment(x))
+        .filter(x => !x.isBefore(now.startOf('day')));
+    const nextRest = rest && rest[0];
+    const diffRest = moment.duration(nextRest.diff(now.startOf()));
+    data.garbage.rest = getNotificationText(diffRest.days());
+
+    const papier = garbage.papier
+        .map(x => moment(x))
+        .filter(x => !x.isBefore(now.startOf('day')));
+    const nextPapier = papier && papier[0];
+    const diffPapier = moment.duration(nextPapier.diff(now.startOf()));
+    data.garbage.papier = getNotificationText(diffPapier.days());
+
     weather.getWeatherForecast(function (err, obj) {
         obj.list.filter(element => {
             const ts = moment.utc(element.dt, "X");
@@ -106,12 +121,12 @@ function refresh() {
             }
         });
 
-	weather.getTemperature(function (err, temp) {
-        	console.log(temp);
-        	data.weather.current.temperature = `${temp.toFixed(1)}°C`;
-                let dataString = JSON.stringify(data);
-                fs.writeFileSync('data.json', dataString);
-    	});
+        weather.getTemperature(function (err, temp) {
+            console.log(temp);
+            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+            let dataString = JSON.stringify(data);
+            fs.writeFileSync('data.json', dataString);
+        });
     });
 }
 
@@ -165,6 +180,14 @@ function getWeekDayName(weekday) {
         default:
             return 'Nix';
     }
+}
+
+function getNotificationText(days) {
+    if (days === 1)
+        return 'MORGEN';
+    else if (days === 0)
+        return 'HEUTE';
+    else return '';
 }
 
 initOpenWeatherMap();
