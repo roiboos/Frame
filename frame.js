@@ -61,10 +61,10 @@ function submitSensorChange(sensorId, lastupdated, attribute, value) {
     const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
     const open = sensors.reduce((sum, next) => sum || next.open, false);
     if (sensor.location === 'eg') {
-        data.windows.eg.open = open;
+        data.windows.eg = open;
     }
     else {
-        data.windows.og.open = open;
+        data.windows.og = open;
     }
     let dataString = JSON.stringify(data);
     fs.writeFileSync('data.json', dataString);
