@@ -55,14 +55,17 @@ function connect() {
 function submitSensorChange(sensorId, lastupdated, attribute, value) {
     console.log(sensorId, value);
     let data = require('./data.json');
-    let floor = sensorId === '2' || sensorId === '5' || sensorId === '10' ? 'eg' : 'og';
-    console.log('Floor', floor);
-    if (floor === 'eg') {
-        data.windows.eg = value;
-    } else {
-        data.windows.og = value;
+    const sensor = data.windows.sensors.find(x => x.id === sensorId);
+    sensor.open = value;
+    console.log('Floor', sensor.location);
+    const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
+    const open = sensors.reduce((sum, next) => sum || next.open, false);
+    if (sensor.location === 'eg') {
+        data.windows.eg.open = open;
     }
-    console.log(data);
+    else {
+        data.windows.og.open = open;
+    }
     let dataString = JSON.stringify(data);
     fs.writeFileSync('data.json', dataString);
 }
