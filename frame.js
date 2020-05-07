@@ -45,7 +45,10 @@ function connect() {
     }
 
     intervalObj = setInterval(() => {
-        refresh();
+        const now = moment();
+        if(now.hour() > 6) {
+            refresh();
+	}
     }, 5 * 60 * 1000);
 }
 
