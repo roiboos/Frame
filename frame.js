@@ -46,7 +46,7 @@ function connect() {
 
     intervalObj = setInterval(() => {
         refresh();
-    }, 1 * 10 * 1000);
+    }, 5 * 60 * 1000);
 }
 
 function submitSensorChange(sensorId, lastupdated, attribute, value) {
