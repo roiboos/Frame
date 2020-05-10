@@ -49,7 +49,7 @@ function connect() {
         if (now.hour() > 6) {
             refresh();
         }
-    }, 5 * 60 * 1000);
+    }, 30 * 60 * 1000);
 }
 
 function submitSensorChange(sensorId, lastupdated, attribute, value) {

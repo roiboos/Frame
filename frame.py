@@ -60,7 +60,7 @@ def main():
             image_red = Image.new('1', (600, 448), 255)    # 255: clear the frame
             draw_red = ImageDraw.Draw(image_red)
 
-            font_weekday = ImageFont.truetype('./publicsans-regular.ttf', 48)
+            font_weekday = ImageFont.truetype('./publicsans-regular.ttf', 42)
             font_day = ImageFont.truetype('./publicsans-bold.ttf', 120) 
             font_month = ImageFont.truetype('./publicsans-regular.ttf', 24)
             font_cal_day = ImageFont.truetype('./publicsans-regular.ttf', 16)
@@ -77,7 +77,8 @@ def main():
             draw_black.text(((242-width)/2, 33), day_of_week, font = font_weekday, fill = 255)
 
             day = data['today']['day'];
-            draw_black.text((82, 72), day, font = font_day, fill = 255)
+            (width, height) = font_day.getsize(day);
+            draw_black.text(((242-width)/2, 72), day, font = font_day, fill = 255)
 
             print(data['today']['month'])
             print(data['today']['year'])
