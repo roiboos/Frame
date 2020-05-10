@@ -7,6 +7,7 @@ var host = '192.168.178.49';
 var port = 443;
 var admin = require("firebase-admin");
 var serviceAccount = require("./serviceAccountKey.json");
+const express = require('express');
 
 var ws;
 var intervalObj;
@@ -75,12 +76,6 @@ function submitSensorChange(sensorId, lastupdated, attribute, value) {
 
 function refresh() {
     const now = moment();
-    log.info('Day', now.date());
-    log.info('Month', now.month());
-    log.info('Year', now.year());
-    log.info('DayOfWeek', now.isoWeekday());
-    log.info('Days', now.daysInMonth());
-
     let data = require('./data.json');
     data.today.dayofweek = getWeekDayName(now.isoWeekday());
     data.today.day = `${now.date()}`;
@@ -125,7 +120,7 @@ function refresh() {
         });
 
         weather.getTemperature(function (err, temp) {
-            log.info(temp);
+            log.info('Current temp ', temp);
             data.weather.current.temperature = `${temp.toFixed(1)}°C`;
             let dataString = JSON.stringify(data);
             fs.writeFileSync('data.json', dataString);
@@ -205,7 +200,8 @@ function sendHeartbeat() {
 const SimpleNodeLogger = require('simple-node-logger'),
     opts = {
         logFilePath: 'framejs.log',
-        timestampFormat: 'YYYY-MM-DD HH:mm:ss'
+        timestampFormat: 'YYYY-MM-DD HH:mm:ss',
+
     },
     log = SimpleNodeLogger.createSimpleLogger(opts);
 
@@ -213,6 +209,17 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://myhub-e496a.firebaseio.com"
 });
+
+const app = express();
+app.get('/logs', (req, res) => {
+    fs.readFile("framejs.log", "utf8", function (err, data) {
+        if (err) throw err;
+        var logs = data.toString().replace(new RegExp('\r\n', 'g'), '<br>');
+        res.send(logs);
+    });
+});
+app.listen(3000);
+
 initOpenWeatherMap();
 refresh();
 connect();
