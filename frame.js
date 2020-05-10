@@ -5,6 +5,8 @@ var moment = require('moment');
 var WebSocket = require('ws');
 var host = '192.168.178.49';
 var port = 443;
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
 
 var ws;
 var intervalObj;
@@ -45,8 +47,8 @@ function connect() {
     }
 
     intervalObj = setInterval(() => {
+        sendHeartbeat();
         const now = moment();
-        submitHeartbeat(now);
         if (now.hour() > 6) {
             refresh();
         }
@@ -69,10 +71,6 @@ function submitSensorChange(sensorId, lastupdated, attribute, value) {
     }
     let dataString = JSON.stringify(data);
     fs.writeFileSync('data.json', dataString);
-}
-
-function submitHeartbeat(now) {
-    fs.writeFileSync('heartbeat.dat', now.format());
 }
 
 function refresh() {
@@ -193,7 +191,15 @@ function getNotificationText(days) {
     else if (days === 0)
         return 'HEUTE';
     else return '';
-} 
+}
+
+function sendHeartbeat() {
+    log.info("Sending heartbeat");
+    var database = admin.database();
+    var gatewayRef = database.ref('frame');
+    var heartbeat = new Date().toISOString();
+    gatewayRef.set({ heartbeat: heartbeat });
+}
 
 // create a custom timestamp format for log statements
 const SimpleNodeLogger = require('simple-node-logger'),
@@ -202,6 +208,12 @@ const SimpleNodeLogger = require('simple-node-logger'),
         timestampFormat: 'YYYY-MM-DD HH:mm:ss'
     },
     log = SimpleNodeLogger.createSimpleLogger(opts);
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://myhub-e496a.firebaseio.com"
+});
 initOpenWeatherMap();
 refresh();
 connect();
+sendHeartbeat();
