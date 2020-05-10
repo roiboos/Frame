@@ -18,11 +18,11 @@ function initOpenWeatherMap() {
 function connect() {
     ws = new WebSocket('ws://' + host + ':' + port);
     ws.onopen = function () {
-        console.log('Connected');
+        log.info('Connected');
     };
 
     ws.onclose = function (e) {
-        console.log('Socket is closed. Reconnect will be attempted in 5 seconds.', e.reason);
+        log.info('Socket is closed. Reconnect will be attempted in 5 seconds.', e.reason);
         setTimeout(function () {
             connect();
         }, 5000);
@@ -30,14 +30,14 @@ function connect() {
 
     ws.onmessage = function (msg) {
         payload = JSON.parse(msg.data);
-        console.log(payload);
+        log.info(payload);
         if (payload.e == 'changed' && payload.r == 'sensors') {
             var sensorid = payload.id;
             if (payload.state != null && payload.state.lastupdated != null) {
                 var lastupdated = payload.state.lastupdated;
                 if (payload.state.open != null) {
                     var open = payload.state.open;
-                    console.log('Submitting' + sensorid + ' ' + lastupdated + ' ' + open);
+                    log.info('Submitting' + sensorid + ' ' + lastupdated + ' ' + open);
                     submitSensorChange(sensorid, lastupdated, 'open', open);
                 }
             }
@@ -46,18 +46,19 @@ function connect() {
 
     intervalObj = setInterval(() => {
         const now = moment();
+        submitHeartbeat(now);
         if (now.hour() > 6) {
             refresh();
         }
-    }, 5 * 60 * 1000);
+    }, 10 * 1000);
 }
 
 function submitSensorChange(sensorId, lastupdated, attribute, value) {
-    console.log(sensorId, value);
+    log.info(sensorId, value);
     let data = require('./data.json');
     const sensor = data.windows.sensors.find(x => x.id === sensorId);
     sensor.open = value;
-    console.log('Floor', sensor.location);
+    log.info('Floor', sensor.location);
     const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
     const open = sensors.reduce((sum, next) => sum || next.open, false);
     if (sensor.location === 'eg') {
@@ -70,13 +71,17 @@ function submitSensorChange(sensorId, lastupdated, attribute, value) {
     fs.writeFileSync('data.json', dataString);
 }
 
+function submitHeartbeat(now) {
+    fs.writeFileSync('heartbeat.dat', now.format());
+}
+
 function refresh() {
     const now = moment();
-    console.log('Day', now.date());
-    console.log('Month', now.month());
-    console.log('Year', now.year());
-    console.log('DayOfWeek', now.isoWeekday());
-    console.log('Days', now.daysInMonth());
+    log.info('Day', now.date());
+    log.info('Month', now.month());
+    log.info('Year', now.year());
+    log.info('DayOfWeek', now.isoWeekday());
+    log.info('Days', now.daysInMonth());
 
     let data = require('./data.json');
     data.today.dayofweek = getWeekDayName(now.isoWeekday());
@@ -122,7 +127,7 @@ function refresh() {
         });
 
         weather.getTemperature(function (err, temp) {
-            console.log(temp);
+            log.info(temp);
             data.weather.current.temperature = `${temp.toFixed(1)}°C`;
             let dataString = JSON.stringify(data);
             fs.writeFileSync('data.json', dataString);
@@ -188,8 +193,15 @@ function getNotificationText(days) {
     else if (days === 0)
         return 'HEUTE';
     else return '';
-}
+} 
 
+// create a custom timestamp format for log statements
+const SimpleNodeLogger = require('simple-node-logger'),
+    opts = {
+        logFilePath: 'framejs.log',
+        timestampFormat: 'YYYY-MM-DD HH:mm:ss'
+    },
+    log = SimpleNodeLogger.createSimpleLogger(opts);
 initOpenWeatherMap();
 refresh();
 connect();
