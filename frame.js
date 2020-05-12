@@ -214,7 +214,7 @@ const app = express();
 app.get('/logs/js', (req, res) => {
     fs.readFile("framejs.log", "utf8", function (err, data) {
         if (err) throw err;
-        var logs = data.toString().replace(new RegExp('\r\n', 'g'), '<br>');
+        var logs = data.toString().replace(new RegExp('\n', 'g'), '<br>');
         res.send(logs);
     });
 });
