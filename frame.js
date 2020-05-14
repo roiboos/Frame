@@ -33,14 +33,13 @@ function connect() {
 
     ws.onmessage = function (msg) {
         payload = JSON.parse(msg.data);
-        log.info(payload);
         if (payload.e == 'changed' && payload.r == 'sensors') {
             var sensorid = payload.id;
             if (payload.state != null && payload.state.lastupdated != null) {
                 var lastupdated = payload.state.lastupdated;
                 if (payload.state.open != null) {
                     var open = payload.state.open;
-                    log.info('Submitting' + sensorid + ' ' + lastupdated + ' ' + open);
+                    log.info('Submitting ' + sensorid + ' ' + lastupdated + ' ' + open);
                     submitSensorChange(sensorid, lastupdated, 'open', open);
                 }
             }
@@ -50,7 +49,7 @@ function connect() {
     intervalObj = setInterval(() => {
         sendHeartbeat();
         const now = moment();
-        if (now.hour() > 6) {
+        if (now.hour() >=  6) {
             refresh();
         }
     }, 30 * 60 * 1000);
@@ -61,7 +60,7 @@ function submitSensorChange(sensorId, lastupdated, attribute, value) {
     let data = require('./data.json');
     const sensor = data.windows.sensors.find(x => x.id === sensorId);
     sensor.open = value;
-    log.info('Floor', sensor.location);
+    log.info('Floor ', sensor.location);
     const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
     const open = sensors.reduce((sum, next) => sum || next.open, false);
     if (sensor.location === 'eg') {
@@ -120,7 +119,6 @@ function refresh() {
         });
 
         weather.getTemperature(function (err, temp) {
-            log.info('Current temp ', temp);
             data.weather.current.temperature = `${temp.toFixed(1)}°C`;
             let dataString = JSON.stringify(data);
             fs.writeFileSync('data.json', dataString);
@@ -196,12 +194,19 @@ function sendHeartbeat() {
     gatewayRef.set({ heartbeat: heartbeat });
 }
 
+function sendFileContent(file, res) {
+    fs.readFile(file, "utf8", function (err, data) {
+        if (err) throw err;
+        var logs = data.toString().replace(new RegExp('\n', 'g'), '<br>');
+        res.send(logs);
+    });
+}
+
 // create a custom timestamp format for log statements
 const SimpleNodeLogger = require('simple-node-logger'),
     opts = {
         logFilePath: 'framejs.log',
         timestampFormat: 'YYYY-MM-DD HH:mm:ss',
-
     },
     log = SimpleNodeLogger.createSimpleLogger(opts);
 
@@ -212,11 +217,13 @@ admin.initializeApp({
 
 const app = express();
 app.get('/logs/js', (req, res) => {
-    fs.readFile("framejs.log", "utf8", function (err, data) {
-        if (err) throw err;
-        var logs = data.toString().replace(new RegExp('\n', 'g'), '<br>');
-        res.send(logs);
-    });
+    sendFileContent("framejs.log", res);
+});
+app.get('/logs/py', (req, res) => {
+    sendFileContent("framepy.log", res);
+});
+app.get('/data', (req, res) => {
+    sendFileContent("data.json", res);
 });
 app.listen(3000);
 
