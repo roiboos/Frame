@@ -89,14 +89,14 @@ function refresh() {
         .filter(x => !x.isBefore(now.startOf('day')));
     const nextRest = rest && rest[0];
     const diffRest = moment.duration(nextRest.diff(now.startOf()));
-    data.garbage.rest = getNotificationText(diffRest.days());
+    data.garbage.rest = getNotificationText(diffRest.asDays());
 
     const papier = garbage.papier
         .map(x => moment(x))
         .filter(x => !x.isBefore(now.startOf('day')));
     const nextPapier = papier && papier[0];
     const diffPapier = moment.duration(nextPapier.diff(now.startOf()));
-    data.garbage.papier = getNotificationText(diffPapier.days());
+    data.garbage.papier = getNotificationText(diffPapier.asDays());
 
     weather.getWeatherForecast(function (err, obj) {
         obj.list.filter(element => {
