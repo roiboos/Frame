@@ -19,55 +19,38 @@ function initOpenWeatherMap() {
 }
 
 function connect() {
-    ws = new WebSocket('ws://' + host + ':' + port);
-    ws.onopen = function () {
-        log.info('Connected');
-    };
-
-    ws.onclose = function (e) {
-        log.info('Socket is closed. Reconnect will be attempted in 5 seconds.', e.reason);
-        setTimeout(function () {
-            connect();
-        }, 5000);
-    };
-
-    ws.onmessage = function (msg) {
-        payload = JSON.parse(msg.data);
-        if (payload.e == 'changed' && payload.r == 'sensors') {
-            var sensorid = payload.id;
-            if (payload.state != null && payload.state.lastupdated != null) {
-                var lastupdated = payload.state.lastupdated;
-                if (payload.state.open != null) {
-                    var open = payload.state.open;
-                    log.info('Submitting ' + sensorid + ' ' + lastupdated + ' ' + open);
-                    submitSensorChange(sensorid, lastupdated, 'open', open);
-                }
-            }
-        };
-    }
+    admin.database().ref('/sensors').orderByChild('type').equalTo('openclose')
+        .on('value', (eventSnapshot) => {
+            const sensors = eventSnapshot.val();
+            Object.keys(sensors).forEach((key) => {
+                const sensor = sensors[key];
+                log.info(key, sensor.state.open);
+                submitSensorChange(key, sensor.state.open);
+            });
+        });
 
     intervalObj = setInterval(() => {
         sendHeartbeat();
         const now = moment();
-        if (now.hour() >=  6) {
+        if (now.hour() >= 6) {
             refresh();
         }
     }, 30 * 60 * 1000);
 }
 
-function submitSensorChange(sensorId, lastupdated, attribute, value) {
-    log.info(sensorId, value);
+function submitSensorChange(sensorId, value) {
     let data = require('./data.json');
     const sensor = data.windows.sensors.find(x => x.id === sensorId);
-    sensor.open = value;
-    log.info('Floor ', sensor.location);
+    sensor.open = value || false;
     const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
     const open = sensors.reduce((sum, next) => sum || next.open, false);
     if (sensor.location === 'eg') {
         data.windows.eg = open;
+        log.info('EG ', open ? 'open' : 'closed');
     }
     else {
         data.windows.og = open;
+        log.info('OG ', open ? 'open' : 'closed');
     }
     let dataString = JSON.stringify(data);
     fs.writeFileSync('data.json', dataString);
