@@ -16,7 +16,7 @@ function initOpenWeatherMap() {
     weather.setAPPID('762ba7a272a0aeb54620825407f3c259');
     weather.setCityId(2823682);
     weather.setUnits('metric');
-}
+    weather.setLang('en');}
 
 function connect() {
     admin.database().ref('/sensors').orderByChild('type').equalTo('openclose')
@@ -119,6 +119,13 @@ function refresh() {
             }
         });
 
+        weather.getSmartJSON(function(err, weatherdata){
+                log.info('Weather ', weatherdata);
+                data.weather.current.weathercode = weatherdata.weathercode;
+                let dataString = JSON.stringify(data);
+                fs.writeFileSync('data.json', dataString);
+         });
+         
         // weather.getTemperature(function (err, temp) {
         //     data.weather.current.temperature = `${temp.toFixed(1)}°C`;
         //     let dataString = JSON.stringify(data);
