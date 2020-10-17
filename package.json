@@ -5,8 +5,8 @@
   "main": "frame.js",
   "dependencies": {
     "express": "^4.17.1",
-    "firebase-admin": "^8.12.1",
-    "forever": "^2.0.0",
+    "firebase-admin": "^9.2.0",
+    "forever": "^3.0.2",
     "minimist": "^1.2.5",
     "moment": "^2.25.3",
     "openweather-apis": "^4.3.1",
