@@ -29,6 +29,16 @@ function connect() {
             });
         });
 
+    admin.database().ref('/sensors').orderByChild('type').equalTo('temperature')
+        .on('value', (eventSnapshot) => {
+            const sensors = eventSnapshot.val();
+            Object.keys(sensors).forEach((key) => {
+                const sensor = sensors[key];
+                log.info(key, sensor.state.temperature);
+                submitTempSensorChange(key, sensor.state.temperature);
+            });
+        });
+
     intervalObj = setInterval(() => {
         sendHeartbeat();
         const now = moment();
@@ -36,6 +46,14 @@ function connect() {
             refresh();
         }
     }, 30 * 60 * 1000);
+}
+
+function submitTempSensorChange(sensorId, value) {
+    let data = require('./data.json');
+    const temp = (value || 0) / 100;
+    data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+    let dataString = JSON.stringify(data);
+    fs.writeFileSync('data.json', dataString);
 }
 
 function submitSensorChange(sensorId, value) {
@@ -101,11 +119,11 @@ function refresh() {
             }
         });
 
-        weather.getTemperature(function (err, temp) {
-            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
-            let dataString = JSON.stringify(data);
-            fs.writeFileSync('data.json', dataString);
-        });
+        // weather.getTemperature(function (err, temp) {
+        //     data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+        //     let dataString = JSON.stringify(data);
+        //     fs.writeFileSync('data.json', dataString);
+        // });
     });
 }
 
