@@ -104,7 +104,7 @@ def main():
                 draw_black.text((379, 201), data['garbage']['papier'], font = font_garbage, fill = 0)
 
             draw_black.text((414, 300), data['weather']['current']['temperature'], font = font_temp_current, fill = 0)
-            image_weather = Image.open('clear.bmp')
+            image_weather = Image.open('clouds.bmp')
             image_black.paste(image_weather, (300,283)) 
 
             draw_black.text((280, 410), data['weather']['morning']['temperature'], font = font_temp_forecast, fill = 0)

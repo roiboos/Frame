@@ -100,7 +100,9 @@ function refresh() {
     data.garbage.papier = getNotificationText(diffPapier.asDays());
 
     weather.getWeatherForecast(function (err, obj) {
-        obj.list.filter(element => {
+	console.log('Error', err);
+	console.log('Object', obj);
+        /*obj.list.filter(element => {
             const ts = moment.utc(element.dt, "X");
             return (ts.date() === now.date() || ts.date() === now.date() + 1) && ts.month() === now.month();
         }).forEach(element => {
@@ -117,7 +119,7 @@ function refresh() {
             if (ts.hour() === 12 && ts.date() === now.date()) {
                 data.weather.afternoon.temperature = `${element.main.temp.toFixed(1)}°C`
             }
-        });
+        });*/
 
         weather.getSmartJSON(function(err, weatherdata){
                 log.info('Weather ', weatherdata);
@@ -233,7 +235,7 @@ app.get('/logs/py', (req, res) => {
 app.get('/data', (req, res) => {
     sendFileContent("data.json", res);
 });
-app.listen(3000);
+//app.listen(3001);
 
 initOpenWeatherMap();
 refresh();
