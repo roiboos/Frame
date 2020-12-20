@@ -16,7 +16,8 @@ function initOpenWeatherMap() {
     weather.setAPPID('762ba7a272a0aeb54620825407f3c259');
     weather.setCityId(2823682);
     weather.setUnits('metric');
-    weather.setLang('en');}
+    weather.setLang('en');
+}
 
 function connect() {
     admin.database().ref('/sensors').orderByChild('type').equalTo('openclose')
@@ -100,39 +101,45 @@ function refresh() {
     data.garbage.papier = getNotificationText(diffPapier.asDays());
 
     weather.getWeatherForecast(function (err, obj) {
-	console.log('Error', err);
-	console.log('Object', obj);
-        /*obj.list.filter(element => {
+        data.weather.evening.temperature = '-';
+        data.weather.night.temperature = '-';
+        data.weather.morning.temperature = '-';
+        data.weather.afternoon.temperature = '-';
+
+        obj.list.filter(element => {
             const ts = moment.utc(element.dt, "X");
             return (ts.date() === now.date() || ts.date() === now.date() + 1) && ts.month() === now.month();
         }).forEach(element => {
             const ts = moment.utc(element.dt, "X");
             if (ts.hour() === 18 && ts.date() === now.date()) {
-                data.weather.evening.temperature = `${element.main.temp.toFixed(1)}°C`
+                data.weather.evening.temperature = `${element.main.temp.toFixed(1)}°C`;
             }
             if (ts.hour() === 3 && ts.date() === now.date() + 1) {
-                data.weather.night.temperature = `${element.main.temp.toFixed(1)}°C`
+                data.weather.night.temperature = `${element.main.temp.toFixed(1)}°C`;
             }
             if (ts.hour() === 9 && ts.date() === now.date()) {
-                data.weather.morning.temperature = `${element.main.temp.toFixed(1)}°C`
+                data.weather.morning.temperature = `${element.main.temp.toFixed(1)}°C`;
             }
             if (ts.hour() === 12 && ts.date() === now.date()) {
-                data.weather.afternoon.temperature = `${element.main.temp.toFixed(1)}°C`
+                data.weather.afternoon.temperature = `${element.main.temp.toFixed(1)}°C`;
             }
-        });*/
+        });
 
-        weather.getSmartJSON(function(err, weatherdata){
-                log.info('Weather ', weatherdata);
-                data.weather.current.weathercode = weatherdata.weathercode;
-                let dataString = JSON.stringify(data);
-                fs.writeFileSync('data.json', dataString);
-         });
-         
-        // weather.getTemperature(function (err, temp) {
-        //     data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+        let dataString = JSON.stringify(data);
+        fs.writeFileSync('data.json', dataString);
+
+        // weather.getSmartJSON(function (err, weatherdata) {
+        //     log.info('Weather ', weatherdata);
+        //     data.weather.current.weathercode = weatherdata.weathercode;
         //     let dataString = JSON.stringify(data);
         //     fs.writeFileSync('data.json', dataString);
         // });
+
+        weather.getTemperature(function (err, temp) {
+            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+            let dataString = JSON.stringify(data);
+            fs.writeFileSync('data.json', dataString);
+        });
     });
 }
 
@@ -235,7 +242,7 @@ app.get('/logs/py', (req, res) => {
 app.get('/data', (req, res) => {
     sendFileContent("data.json", res);
 });
-//app.listen(3001);
+app.listen(3001);
 
 initOpenWeatherMap();
 refresh();
