@@ -49,10 +49,19 @@ function connect() {
     }, 30 * 60 * 1000);
 }
 
-function submitTempSensorChange(sensorId, value) {
+function submitTempSensorChange(sensorId, value, lastupdated) {
     let data = require('./data.json');
     const temp = (value || 0) / 100;
-    data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+    const ts = moment.utc(lastupdated);
+    const nowInUTC = moment.utc(moment());
+    const diff = moment.duration(nowInUTC.startOf().diff(ts));
+    log.info("Diff ", diff.asMinutes());
+    if (diff.asMinutes() > 60) {
+        data.weather.current.temperature = '-';
+    }
+    else {
+        data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+    }
     let dataString = JSON.stringify(data);
     fs.writeFileSync('data.json', dataString);
 }
