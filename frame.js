@@ -135,11 +135,11 @@ function refresh() {
         //     fs.writeFileSync('data.json', dataString);
         // });
 
-        weather.getTemperature(function (err, temp) {
-            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
-            let dataString = JSON.stringify(data);
-            fs.writeFileSync('data.json', dataString);
-        });
+        //weather.getTemperature(function (err, temp) {
+        //    data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+        //    let dataString = JSON.stringify(data);
+        //    fs.writeFileSync('data.json', dataString);
+        //});
     });
 }
 
@@ -242,7 +242,7 @@ app.get('/logs/py', (req, res) => {
 app.get('/data', (req, res) => {
     sendFileContent("data.json", res);
 });
-app.listen(3001);
+app.listen(3002);
 
 initOpenWeatherMap();
 refresh();

@@ -88,7 +88,7 @@ def main():
 
             base = data['calendar']['first']
             days_in_month = data['calendar']['days'] 
-            for i in range(base, days_in_month + 1 + base):
+            for i in range(base, days_in_month + base):
                 draw_black.text(((16+((i-1) % 7)*32), 309 + ((i-1)//7*28)), str(i-base+1), font = font_cal_day, fill = 255)
 
             garbage_rest = data['garbage']['rest'];
