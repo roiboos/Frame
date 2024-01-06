@@ -30,7 +30,7 @@ function connect() {
             });
         });
 
-    /*admin.database().ref('/sensors').orderByChild('type').equalTo('temperature')
+    admin.database().ref('/sensors').orderByChild('type').equalTo('temperature')
         .on('value', (eventSnapshot) => {
             const sensors = eventSnapshot.val();
             Object.keys(sensors).forEach((key) => {
@@ -38,7 +38,7 @@ function connect() {
                 log.info(key, sensor.state.temperature);
                 submitTempSensorChange(key, sensor.state.temperature);
             });
-        });*/
+        });
 
     intervalObj = setInterval(() => {
         sendHeartbeat();
@@ -144,11 +144,11 @@ function refresh() {
         //     fs.writeFileSync('data.json', dataString);
         // });
 
-        weather.getTemperature(function (err, temp) {
-            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
-            let dataString = JSON.stringify(data);
-            fs.writeFileSync('data.json', dataString);
-        });
+        //weather.getTemperature(function (err, temp) {
+        //    data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+        //    let dataString = JSON.stringify(data);
+        //    fs.writeFileSync('data.json', dataString);
+        //});
     });
 }
 
@@ -251,7 +251,7 @@ app.get('/logs/py', (req, res) => {
 app.get('/data', (req, res) => {
     sendFileContent("data.json", res);
 });
-//app.listen(3003);
+app.listen(3002);
 
 initOpenWeatherMap();
 refresh();
