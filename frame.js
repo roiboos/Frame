@@ -36,7 +36,7 @@ function connect() {
             Object.keys(sensors).forEach((key) => {
                 const sensor = sensors[key];
                 log.info(key, sensor.state.temperature);
-                submitTempSensorChange(key, sensor.state.temperature);
+                //submitTempSensorChange(key, sensor.state.temperature);
             });
         });
 
@@ -84,6 +84,11 @@ function submitSensorChange(sensorId, value) {
     fs.writeFileSync('data.json', dataString);
 }
 
+
+function getTemperatureFromFile() {
+     return fs.readFileSync('temperature.txt', 'utf8');	
+}
+
 function refresh() {
     const now = moment();
     let data = require('./data.json');
@@ -108,6 +113,9 @@ function refresh() {
     const nextPapier = papier && papier[0];
     const diffPapier = moment.duration(nextPapier.diff(now.startOf()));
     data.garbage.papier = getNotificationText(diffPapier.asDays());
+
+    const temperature = getTemperatureFromFile();
+    data.weather.current.temperature = `${temperature}°C`;
 
     weather.getWeatherForecast(function (err, obj) {
         data.weather.evening.temperature = '-';
@@ -145,7 +153,8 @@ function refresh() {
         // });
 
         //weather.getTemperature(function (err, temp) {
-        //    data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+        //    data.weather.current.temperature = `${temp.toFixed(1)}°C`
+;
         //    let dataString = JSON.stringify(data);
         //    fs.writeFileSync('data.json', dataString);
         //});
@@ -251,7 +260,7 @@ app.get('/logs/py', (req, res) => {
 app.get('/data', (req, res) => {
     sendFileContent("data.json", res);
 });
-app.listen(3002);
+app.listen(3003);
 
 initOpenWeatherMap();
 refresh();
