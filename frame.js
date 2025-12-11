@@ -114,8 +114,8 @@ function refresh() {
     const diffPapier = moment.duration(nextPapier.diff(now.startOf()));
     data.garbage.papier = getNotificationText(diffPapier.asDays());
 
-    const temperature = getTemperatureFromFile();
-    data.weather.current.temperature = `${temperature}°C`;
+    //const temperature = getTemperatureFromFile();
+    //data.weather.current.temperature = `${temperature}°C`;
 
     weather.getWeatherForecast(function (err, obj) {
         data.weather.evening.temperature = '-';
@@ -152,12 +152,11 @@ function refresh() {
         //     fs.writeFileSync('data.json', dataString);
         // });
 
-        //weather.getTemperature(function (err, temp) {
-        //    data.weather.current.temperature = `${temp.toFixed(1)}°C`
-;
-        //    let dataString = JSON.stringify(data);
-        //    fs.writeFileSync('data.json', dataString);
-        //});
+        weather.getTemperature(function (err, temp) {
+            data.weather.current.temperature = `${temp.toFixed(1)}°C`;
+            let dataString = JSON.stringify(data);
+            fs.writeFileSync('data.json', dataString);
+        });
     });
 }
 
