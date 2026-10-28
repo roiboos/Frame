@@ -42,10 +42,14 @@ def main():
     epd = epd5in83b.EPD()
 
     while True:
-        with open('./data.json', 'r') as read_file:
-            data = json.load(read_file) 
-        with open('./data.json', 'r') as read_file:
-            content = read_file.read();
+        try:
+            with open('./data.json', 'r') as read_file:
+                content = read_file.read()
+            data = json.loads(content)
+        except (OSError, ValueError) as e:
+            print('Could not read data.json: ' + str(e))
+            time.sleep(5)
+            continue
 
         hash_returned = hashlib.md5(content.encode('utf-8')).hexdigest()
         print(hash_returned)

@@ -23,20 +23,14 @@ function connect() {
     admin.database().ref('/sensors').orderByChild('type').equalTo('openclose')
         .on('value', (eventSnapshot) => {
             const sensors = eventSnapshot.val();
+            if (!sensors) {
+                log.warn('No openclose sensors found');
+                return;
+            }
             Object.keys(sensors).forEach((key) => {
                 const sensor = sensors[key];
                 log.info(key, sensor.state.open);
                 submitSensorChange(key, sensor.state.open);
-            });
-        });
-
-    admin.database().ref('/sensors').orderByChild('type').equalTo('temperature')
-        .on('value', (eventSnapshot) => {
-            const sensors = eventSnapshot.val();
-            Object.keys(sensors).forEach((key) => {
-                const sensor = sensors[key];
-                log.info(key, sensor.state.temperature);
-                //submitTempSensorChange(key, sensor.state.temperature);
             });
         });
 
@@ -63,12 +57,16 @@ function submitTempSensorChange(sensorId, value, lastupdated) {
         data.weather.current.temperature = `${temp.toFixed(1)}°C`;
     }
     let dataString = JSON.stringify(data);
-    fs.writeFileSync('data.json', dataString);
+    writeData(dataString);
 }
 
 function submitSensorChange(sensorId, value) {
     let data = require('./data.json');
     const sensor = data.windows.sensors.find(x => x.id === sensorId);
+    if (!sensor) {
+        log.warn('Unknown sensor ', sensorId);
+        return;
+    }
     sensor.open = value || false;
     const sensors = data.windows.sensors.filter(x => x.location === sensor.location);
     const open = sensors.reduce((sum, next) => sum || next.open, false);
@@ -81,9 +79,14 @@ function submitSensorChange(sensorId, value) {
         log.info('OG ', open ? 'open' : 'closed');
     }
     let dataString = JSON.stringify(data);
-    fs.writeFileSync('data.json', dataString);
+    writeData(dataString);
 }
 
+// Write to a temp file and rename, so frame.py never reads a half-written data.json
+function writeData(dataString) {
+    fs.writeFileSync('data.json.tmp', dataString);
+    fs.renameSync('data.json.tmp', 'data.json');
+}
 
 function getTemperatureFromFile() {
      return fs.readFileSync('temperature.txt', 'utf8');	
@@ -143,7 +146,7 @@ function refresh() {
         });
 
         let dataString = JSON.stringify(data);
-        fs.writeFileSync('data.json', dataString);
+        writeData(dataString);
 
         // weather.getSmartJSON(function (err, weatherdata) {
         //     log.info('Weather ', weatherdata);
@@ -155,7 +158,7 @@ function refresh() {
         weather.getTemperature(function (err, temp) {
             data.weather.current.temperature = `${temp.toFixed(1)}°C`;
             let dataString = JSON.stringify(data);
-            fs.writeFileSync('data.json', dataString);
+            writeData(dataString);
         });
     });
 }

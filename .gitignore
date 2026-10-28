@@ -5,3 +5,4 @@ data.json
 serviceAccountKey.json
 *.log
 *.bak
+data.json.tmp
